@@ -118,9 +118,3 @@ Iterate through reviews.
 
 ---
 
-If you want, I can:
-
-- expand design documentation
-- write architecture diagrams
-- add contribution guidelines
-- or create a getting started guide.
