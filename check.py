@@ -126,7 +126,7 @@ def check_ollama_ready(selected_model="deepseek-r1:8b"):
         return False
     
 # Tracks the conversation and handles the streaming response from Ollama.
-def stream_generate(model, messages, think=False, stream=True, num_predict=1024, num_ctx=1024, temperature=0.7, top_p=0.9):
+def stream_generate(model, messages,tools, think=False, stream=True, num_predict=1024, num_ctx=1024, temperature=0.7, top_p=0.9):
     """
     Streams responses from Ollama and handles:
     - thinking tokens
@@ -137,8 +137,9 @@ def stream_generate(model, messages, think=False, stream=True, num_predict=1024,
     stream = chat(
         model=model,
         messages=messages,
+        tools=tools,
         think=think,
-        stream=True,
+        stream=stream,
         options={
             "num_predict":num_predict,
             "num_ctx":num_ctx,
@@ -147,11 +148,13 @@ def stream_generate(model, messages, think=False, stream=True, num_predict=1024,
         }
     )
 
+    tool_calls_detected = False
     in_thinking = False
     content = ""
     thinking = ""
 
     for chunk in stream:
+        # Handle thinking tokens
         if getattr(chunk.message, "thinking", None):
             if not in_thinking:
                 in_thinking = True
@@ -160,6 +163,7 @@ def stream_generate(model, messages, think=False, stream=True, num_predict=1024,
             print(chunk.message.thinking, end="", flush=True)
             thinking += chunk.message.thinking
 
+        # Handle regular tokens
         elif getattr(chunk.message, "content", None):
             if in_thinking:
                 in_thinking = False
@@ -168,8 +172,9 @@ def stream_generate(model, messages, think=False, stream=True, num_predict=1024,
 
             print(chunk.message.content, end="", flush=True)
             content += chunk.message.content
-
+                
     return {
         "thinking": thinking,
-        "content": content
+        "content": content,
+        "tool_calls":tool_calls_detected
     }   

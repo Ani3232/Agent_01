@@ -1,3 +1,9 @@
+# TO RUN
+ clone the directory and 
+ '''
+ python main.py
+ '''
+
 # Agent Tools Framework
 
 This project is a single-agent tool framework designed to enable structured interaction between an LLM and system-level tools. The architecture allows:
